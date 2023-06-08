@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import { Country } from '../../interfaces/country.interface';
 import { CountriesService } from '../../services/country.services';
 
@@ -8,21 +8,34 @@ import { CountriesService } from '../../services/country.services';
   styles: [
   ]
 })
-export class ByCountryPageComponent {
+export class ByCountryPageComponent implements OnInit {
 
   public countries: Country[] = []
+
+  public isLoading: boolean = false;
+
+  public initialValue: string = '';
 
   @Input()
   public placeholder = 'Buscar por Paises'
 
-  constructor(private countriesService: CountriesService) {}
+  constructor(private countriesService: CountriesService) {
+
+  }
+  ngOnInit(): void {
+
+    this.countries = this.countriesService.cacheStore.byCountries.countries;
+    this.initialValue = this.countriesService.cacheStore.byCountries.term;
+
+  }
 
   searchByCountry(term:string ): void{
-    console.log('Desde ByCountry');
-    console.log({term});
+    this.isLoading = true;
+
     this.countriesService.searchCountry(term)
       .subscribe(countries => {
-        this.countries = countries
+        this.countries = countries;
+        this.isLoading = false;
       })
   }
 
